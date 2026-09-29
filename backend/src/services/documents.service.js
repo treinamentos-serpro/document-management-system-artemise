@@ -1,6 +1,6 @@
-const crypto = require('node:crypto');
-const path = require('node:path');
 const documentsRepository = require('../repositories/documents.repository');
+const { createDocumentRecord } = require('./documents.factory');
+const { toPublicDocument } = require('./documents.presenter');
 
 function createError(code) {
   const error = new Error(code);
@@ -8,28 +8,8 @@ function createError(code) {
   return error;
 }
 
-function toPublicDocument(record) {
-  return {
-    id: record.id,
-    originalName: record.originalName,
-    size: record.size,
-    uploadedAt: record.uploadedAt,
-    owner: record.owner,
-  };
-}
-
 async function createDocument(file) {
-  const originalName = path.basename(file.originalname.replace(/\\/g, '/'))
-    .replace(/[\u0000-\u001f\u007f]/g, '_') || 'document';
-  const record = {
-    id: crypto.randomUUID(),
-    originalName,
-    size: file.size,
-    uploadedAt: new Date().toISOString(),
-    owner: 'default',
-    fileName: file.filename,
-    mimeType: file.mimetype,
-  };
+  const record = createDocumentRecord(file);
 
   try {
     await documentsRepository.create(record);
