@@ -1,5 +1,5 @@
-const path = require('node:path');
 const documentsService = require('../services/documents.service');
+const { sanitizeDocumentName } = require('../utils/document-name');
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -31,8 +31,7 @@ async function list(req, res, next) {
 }
 
 function sanitizeDownloadName(originalName) {
-  const baseName = path.basename(originalName.replace(/\\/g, '/'));
-  return baseName.replace(/[\u0000-\u001f\u007f]/g, '_') || 'document';
+  return sanitizeDocumentName(originalName);
 }
 
 async function download(req, res, next) {
